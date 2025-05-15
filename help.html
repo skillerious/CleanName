@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Clean Names — Complete User Guide</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<!-- ═════════  Dark Theme  ═════════ -->
+<style>
+:root{
+  --bg-1:#141419; --bg-2:#21212a; --bg-3:#2e2e38;
+  --txt-1:#f5f5f7; --txt-2:#b4b4c1;
+  --accent:#2080ff; --accent-d:#1a6bd6;
+  --radius:9px; --sidebar-w:270px;
+  --shadow:0 6px 18px #000a; font-size:16px;
+  scroll-behavior:smooth;
+}
+*,::before,::after{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg-1);color:var(--txt-1);
+          font-family:Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+h1{font-size:2rem;margin:0 0 1.3rem;font-weight:600}
+h2{font-size:1.45rem;margin:2.45rem 0 1.15rem;color:var(--accent);font-weight:600}
+h3{font-size:1.17rem;margin:1.9rem 0 0.75rem;color:#fff;font-weight:600}
+p{margin:0 0 1.05rem}
+a{color:var(--accent);} a:hover{text-decoration:underline}
+code,pre{background:var(--bg-3);padding:4px 7px;border-radius:5px;font-size:0.93rem;color:#eaeaea}
+kbd{display:inline-block;padding:2px 6px;border:1px solid #555;border-radius:4px;font-size:0.8rem;color:var(--txt-2)}
+ul,ol{margin:0 0 1rem;padding-left:1.4rem}
+
+.wrapper{display:flex;min-height:100%}
+
+/* ── sidebar ────────────────────── */
+#side-toggle{display:none}
+aside{
+  width:var(--sidebar-w);background:var(--bg-2);padding:1.65rem 1rem 2.3rem;
+  position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid #000;
+  transition:transform .32s;
+}
+aside h2{margin:0 0 1.25rem;font-size:1.25rem}
+aside input{
+  width:100%;padding:8px 11px;margin-bottom:1.2rem;border:none;
+  border-radius:var(--radius);background:var(--bg-3);color:var(--txt-1)
+}
+#nav{list-style:none;margin:0;padding:0}
+#nav li{margin:0.43rem 0}
+#nav a{display:block;padding:7px 9px;border-radius:6px;font-size:0.93rem;
+       color:var(--txt-2);transition:background .15s,color .15s}
+#nav a:hover{background:var(--bg-3);color:#fff}
+#nav a.active{background:var(--accent-d);color:#fff;margin-left:-4px;
+              box-shadow:inset 3px 0 0 var(--accent)}
+
+/* ── main pane ─────────────────── */
+main{flex:1;max-width:1020px;margin:auto;padding:2.9rem 3.8rem;line-height:1.68}
+main img.logo{width:215px;margin:0 0 2rem;filter:drop-shadow(0 0 6px #000c)}
+section{position:relative;padding-bottom:.45rem}
+.card{
+  background:var(--bg-2);padding:1.7rem 1.9rem;border-radius:var(--radius);
+  box-shadow:var(--shadow)
+}
+hr{border:none;border-top:1px solid #2b2b33;margin:2.8rem 0}
+
+/* mobile menu */
+@media(max-width:920px){
+  #side-toggle{
+    display:block;position:fixed;top:18px;left:18px;z-index:120;
+    background:var(--accent);border:none;padding:9px;border-radius:50%;box-shadow:var(--shadow)
+  }
+  #side-toggle svg{fill:#fff;width:22px;height:22px}
+  aside{position:fixed;left:0;top:0;transform:translateX(-108%);box-shadow:var(--shadow)}
+  aside.open{transform:none}main{padding-top:80px}
+}
+
+/* misc UI */
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:#444;border-radius:5px}
+#topBtn{position:fixed;bottom:24px;right:26px;width:50px;height:50px;border:none;border-radius:50%;
+        background:var(--accent);display:none;align-items:center;justify-content:center;cursor:pointer;
+        box-shadow:var(--shadow);z-index:95}
+#topBtn svg{fill:#fff;width:28px;height:28px}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0%;z-index:200}
+
+/* cards collapse */
+.collapse-toggle{position:absolute;right:-26px;top:8px;cursor:pointer}
+.collapse-toggle svg{fill:var(--accent);width:17px;height:17px;transition:transform .25s}
+.collapsible{overflow:hidden;max-height:9999px;transition:max-height .35s ease}
+.collapsible.closed{max-height:0}
+.collapsible.closed+.collapse-toggle svg{transform:rotate(-90deg)}
+/* drop-cap */
+.dropcap:first-letter{float:left;font-size:3.15rem;line-height:.88;margin-right:8px;
+                      font-weight:700;color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<button id="side-toggle" aria-label="Menu">
+  <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+</button>
+
+<div class="wrapper">
+<!-- ══ Sidebar ══ -->
+<aside id="sidebar">
+  <h2>Help topics</h2>
+  <input id="filter" placeholder="Filter…" aria-label="Filter topics">
+  <ul id="nav">
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#quickstart">Quick-start</a></li>
+    <li><a href="#interface">Interface tour</a></li>
+    <li><a href="#modes">Rename modes</a></li>
+    <li><a href="#extensions">Extension filter</a></li>
+    <li><a href="#preview">Preview &amp; run</a></li>
+    <li><a href="#undo">Undo &amp; safety</a></li>
+    <li><a href="#preferences">Preferences</a></li>
+    <li><a href="#shortcuts">Keyboard shortcuts</a></li>
+    <li><a href="#troubleshoot">Troubleshooting</a></li>
+    <li><a href="#changelog">Changelog</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+</aside>
+
+<!-- ══ Main ══ -->
+<main>
+  <img src="assets/logo.png" class="logo" alt="Clean Names logo">
+
+  <!-- Overview -->
+  <section id="overview"><h1>Clean Names &ndash; Complete Guide</h1>
+    <div class="card collapsible">
+      <p class="dropcap"><strong>Clean Names</strong> is a cross-platform
+      batch-renaming powerhouse aimed at developers, archivists and content
+      creators. It combines an optimistic GUI with rock-solid safeguards, so
+      you can refactor huge directory trees without fear.</p>
+      <ul>
+        <li><strong>Live preview &amp; collision-proof engine.</strong></li>
+        <li><strong>Two strategies</strong> &mdash; <em>Standard</em>
+            (cleanup) and <em>Sequential</em> (re-index).</li>
+        <li><strong>Per-batch undo</strong> + drag-drop + themeable.</li>
+        <li><strong>Persistent layout</strong>: column widths, splitter, ext-list ticks.</li>
+        <li>Open-source (MIT) &mdash; <a href="https://github.com/skillerious" target="_blank">GitHub</a>.</li>
+      </ul>
+    </div><span class="collapse-toggle"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></span>
+  </section>
+
+  <!-- Quick-start -->
+  <section id="quickstart"><h2>Quick-start</h2>
+    <div class="card collapsible">
+      <ol>
+        <li><strong>Open a folder</strong> via <em>📂</em> or drag-drop.</li>
+        <li><strong>Select mode</strong> (Standard / Sequential).</li>
+        <li>Tick <em>Recursive</em> / <em>Files</em> / <em>Directories</em>
+           as needed.</li>
+        <li>(Optional) Filter by extensions.</li>
+        <li>Press <strong>Preview</strong>, inspect the table.</li>
+        <li>Press <strong>Rename</strong> &mdash; watch progress bar.</li>
+        <li>If something looks off, smash ⤺ <strong>Undo</strong>.</li>
+      </ol>
+      <p>That’s it — average batch time ~3000 files / second on SSD.</p>
+    </div><span class="collapse-toggle"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></span>
+  </section>
+
+  <!-- Interface -->
+  <section id="interface"><h2>Interface tour</h2>
+    <div class="card collapsible">
+      <h3>High-level layout</h3>
+      <ul>
+        <li><strong>Toolbar</strong> (top) – common actions.</li>
+        <li><strong>Splitter</strong> – resizable, remembered.</li>
+        <li><strong>Status-bar</strong> – transient messages + progress.</li>
+      </ul>
+      <h3>Preview table columns</h3>
+      <dl>
+        <dt>Original</dt><dd>File or folder name (tooltip = full path).</dd>
+        <dt>New name</dt><dd>Name that will be applied; greyed if unchanged.</dd>
+        <dt>Type</dt><dd>“Dir” or extension (no dot).</dd>
+        <dt>Size</dt><dd>Human KB for files; blank for dirs.</dd>
+        <dt>Modified</dt><dd>Timestamp (local).</dd>
+      </dl>
+      <p><em>Pro-tip:</em> right-click header &raquo; “Resize to contents”.</p>
+    </div><span class="collapse-toggle"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></span>
+  </section>
+
+  <!-- Modes -->
+  <section id="modes"><h2>Rename modes</h2>
+    <div class="card collapsible">
+      <h3>Standard (clean / remap)</h3>
+      <p><strong>Bad characters box</strong> accepts:</p>
+      <ul>
+        <li>Literal list <code>*?%$</code></li>
+        <li>Ranges <code>A-Z</code> or <code>a-z</code></li>
+        <li>UTF-8 symbols (e.g. <code>🤔</code>)</li>
+      </ul>
+      <p>If replacement char is blank the bad chars are removed; otherwise each
+      bad char becomes that single replacement char.</p>
+
+      <h3>Sequential (index / enumerate)</h3>
+      <ul>
+        <li><strong>Prefix</strong> supports UTF-8 and spaces.</li>
+        <li><strong>Start #</strong> up to 10 million.</li>
+        <li>Zero-padding planned (see roadmap).</li>
+      </ul>
+      <p>Multi-level trees get depth-first sort to keep logical order.</p>
+    </div><span class="collapse-toggle"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></span>
+  </section>
+
+  <!-- Extension filter -->
+  <section id="extensions"><h2>Extension filter</h2>
+    <div class="card collapsible">
+      <p>Checklist is case-insensitive and dot-optional (<code>jpg</code> → <code>.jpg</code>).</p>
+      <h3>Auto-completion</h3>
+      <p>The add-box remembers last 10 custom entries (stored in ini).</p>
+      <h3>Common sets</h3>
+      <table style="font-size:0.9rem">
+        <tr><td>Images</td><td>&nbsp;</td><td><code>.jpg .png .gif .webp .tiff</code></td></tr>
+        <tr><td>Video</td><td></td><td><code>.mp4 .mkv .webm .mov</code></td></tr>
+        <tr><td>Scripts</td><td></td><td><code>.py .sh .ps1 .bat</code></td></tr>
+      </table>
+    </div><span class="collapse-toggle"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></span>
+  </section>
+
+  <!-- Preview & run -->
+  <section id="preview"><h2>Preview &amp; run</h2>
+    <div class="card collapsible">
+      <h3>Status line glossary</h3>
+      <ul>
+        <li><em>Ready</em> — everything parsed, waiting for action.</li>
+        <li><em>Queued</em> — <code>n</code> items need changes.</li>
+        <li><em>Done!</em> — batch succeeded.</li>
+      </ul>
+      <h3>Dry-run testing</h3>
+      <p>Preview is effectively a dry-run; no FS writes occur until
+      <strong>Rename</strong> is clicked.</p>
+      <h3>Progress granularity</h3>
+      <p>Updates with every rename; cancelling midway (window close) is
+      discouraged but partial renames remain valid and Undo still works.</p>
+    </div><span class="collapse-toggle"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></span>
+  </section>
+
+  <!-- Undo -->
+  <section id="undo"><h2>Undo &amp; safety</h2>
+    <div class="card collapsible">
+      <h3>Technical details</h3>
+      <ul>
+        <li>All rename ops are performed via <code>Path.rename()</code>.</li>
+        <li>Order = deepest → shallowest to avoid “parent gone” errors.</li>
+        <li>Undo reverses that list.</li>
+        <li><em>Atomicity:</em> FS crash mid-batch may require manual fix; an
+            optional transaction log is planned.</li>
+      </ul>
+      <h3>Backup strategy</h3>
+      <p>If in doubt, run inside a copy; Clean Names never touches file data,
+      so restoring is just renaming.</p>
+    </div><span class="collapse-toggle"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></span>
+  </section>
+
+  <!-- Preferences -->
+  <section id="preferences"><h2>Preferences</h2>
+    <div class="card collapsible">
+      <p>Config file location:</p>
+      <ul>
+        <li><strong>Windows</strong> — <code>%APPDATA%\CleanNames\clean_names.ini</code></li>
+        <li><strong>Linux&nbsp;/ macOS</strong> — <code>$XDG_CONFIG_HOME/CleanNames/clean_names.ini</code></li>
+      </ul>
+      <p>You can hand-edit (UTF-8) while app is closed; keys are grouped by
+      pane names.</p>
+    </div><span class="collapse-toggle"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></span>
+  </section>
+
+  <!-- Shortcuts -->
+  <section id="shortcuts"><h2>Keyboard shortcuts</h2>
+    <div class="card collapsible">
+      <table style="font-size:0.93rem">
+        <tr><td><kbd>Ctrl&nbsp;+&nbsp;O</kbd></td><td>Open folder dialog</td></tr>
+        <tr><td><kbd>Ctrl&nbsp;+&nbsp;P</kbd></td><td>Preview</td></tr>
+        <tr><td><kbd>Ctrl&nbsp;+&nbsp;R</kbd></td><td>Rename (commit)</td></tr>
+        <tr><td><kbd>Ctrl&nbsp;+&nbsp;Z</kbd></td><td>Undo last batch</td></tr>
+        <tr><td><kbd>Ctrl&nbsp;+&nbsp;,</kbd></td><td>Preferences</td></tr>
+        <tr><td><kbd>F5</kbd></td><td>Refresh preview</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>Clear filter / close dialogs</td></tr>
+      </table>
+      <p>Shortcut scheme mirrors popular code editors.</p>
+    </div><span class="collapse-toggle"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></span>
+  </section>
+
+  <!-- Troubleshooting -->
+  <section id="troubleshoot"><h2>Troubleshooting</h2>
+    <div class="card collapsible">
+      <h3>“Access denied” on Windows</h3>
+      <ul>
+        <li>Run Clean Names as Administrator <em>or</em> take ownership of the folder.</li>
+        <li>Check if files are open in Explorer preview pane.</li>
+      </ul>
+      <h3>Network drive latency</h3>
+      <ul>
+        <li>Large previews over SMB can be slow; map drive and disable recursive when possible.</li>
+      </ul>
+      <h3>GTK themes on Linux</h3>
+      <p>If buttons look off, set <code>QT_QPA_PLATFORMTHEME=gtk3</code> or
+      install <code>qt6ct</code> to force Fusion style.</p>
+    </div><span class="collapse-toggle"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></span>
+  </section>
+
+  <!-- Changelog -->
+  <section id="changelog"><h2>Changelog</h2>
+    <div class="card collapsible">
+      <h3>2.1.6 <span style="color:var(--txt-2)">/ May 2025</span></h3>
+      <ul><li>Splitter persistence + maximized start</li>
+          <li>Help button + interactive guide</li>
+          <li>Tick marks in extension list</li></ul>
+      <h3>2.1.0</h3>
+      <ul><li>Dark Fusion palette, column width save</li></ul>
+      <h3>2.0.0</h3>
+      <ul><li>PySide 6 rewrite, threaded renamer</li></ul>
+    </div><span class="collapse-toggle"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></span>
+  </section>
+
+  <!-- Roadmap -->
+  <section id="roadmap"><h2>Roadmap</h2>
+    <div class="card collapsible">
+      <ul>
+        <li>Zero-padding option (<code>image_0001.jpg</code>).</li>
+        <li>CLI wrapper (<code>cleannames --config batch.json</code>).</li>
+        <li>Transaction log for multi-batch undo across sessions.</li>
+        <li>Template mode (transform using regex or Jinja).</li>
+        <li>Multilingual UI (Crowdin).</li>
+      </ul>
+    </div><span class="collapse-toggle"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></span>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq"><h2>FAQ</h2>
+    <div class="card collapsible">
+      <h3>Does Clean Names support symlinks?</h3>
+      <p>Symlinks are treated as files; their names will change but the link
+      target stays intact.</p>
+
+      <h3>Can I batch across drives?</h3>
+      <p>Yes. Preview is still instant; rename speed drops to FS throughput.</p>
+
+      <h3>Is there a macOS DMG?</h3>
+      <p>Not yet. Use <code>python3 -m pip install cleannames-gui</code> then
+      run <code>python -m cleannames_gui</code>.</p>
+    </div><span class="collapse-toggle"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></span>
+  </section>
+
+  <hr><p style="text-align:center;font-size:.9rem;color:var(--txt-2)">
+    Clean Names v 2.1.6 · MIT License · © 2025 Robin Doak
+  </p>
+</main>
+</div>
+
+<!-- FAB -->
+<button id="topBtn" aria-label="Back to top">
+  <svg viewBox="0 0 24 24"><path d="M12 6l6 6H6z"/></svg>
+</button>
+
+<!-- ═ JS ═ -->
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const sidebar=$('#sidebar'),burger=$('#side-toggle'),filter=$('#filter'),
+      links=$$('#nav a'),secs=links.map(l=>$(l.hash)),
+      topBtn=$('#topBtn'),bar=$('#progress');
+
+/* scroll-spy */
+let ticking=false;
+function spy(){
+ if(ticking)return;requestAnimationFrame(()=>{
+   const top=scrollY+90;let best=-1,dist=1e9;
+   secs.forEach((sec,i)=>{const y=sec.offsetTop;if(y<=top&&top-y<dist){best=i;dist=top-y}});
+   links.forEach((a,i)=>a.classList.toggle('active',i===best));
+   topBtn.classList.toggle('show',scrollY>320);
+   bar.style.width=`${100*scrollY/(document.body.scrollHeight-innerHeight)}%`;
+   ticking=false;});ticking=true;}
+addEventListener('scroll',spy,{passive:true});addEventListener('resize',spy);
+
+/* sidebar toggles */
+burger.onclick=()=>sidebar.classList.toggle('open');
+links.forEach(a=>a.onclick=()=>sidebar.classList.remove('open'));
+
+/* filter nav */
+filter.oninput=e=>{
+  const q=e.target.value.toLowerCase();
+  links.forEach(a=>a.parentElement.style.display=a.textContent.toLowerCase().includes(q)?'':'none');
+};
+
+/* fab */
+topBtn.onclick=()=>scrollTo({top:0,behavior:'smooth'});
+
+/* collapsible cards */
+$$('.collapse-toggle').forEach(t=>{
+  const col=t.previousElementSibling;t.onclick=()=>col.classList.toggle('closed');
+});
+spy(); /* initial run */
+</script>
+</body>
+</html>
